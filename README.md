@@ -18,7 +18,7 @@ Give it a Last.fm username for each person in a group, and it will show:
 2. Set the group size (2–10 people) and enter each person's Last.fm username.
 3. Click **Analyze the group**.
 
-That's it — no installation, no accounts, no sign-in. The site ships with a shared Last.fm API key baked in, so nobody needs to create their own.
+That's it — no installation, no accounts, no sign-in. 
 
 ### Running it with your own API key instead
 
