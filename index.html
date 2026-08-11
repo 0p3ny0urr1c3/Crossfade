@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crossfade — Group Taste Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14110e;
+    --surface:#1f1a15;
+    --surface-2:#2a231c;
+    --paper:#f1e6d3;
+    --ink:#f1e6d3;
+    --ink-dim:#b8ab97;
+    --ink-faint:#8a7c69;
+    --amber:#f2a93b;
+    --green:#7fcb8f;
+    --coral:#e8654a;
+    --blue:#6fa8dc;
+    --violet:#c58af2;
+    --line:rgba(241,230,211,0.12);
+    --line-strong:rgba(241,230,211,0.22);
+    --radius:10px;
+    --font-display:'Oswald',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 15% -10%, rgba(242,169,59,0.08), transparent 45%),
+      radial-gradient(ellipse at 90% 0%, rgba(111,168,220,0.06), transparent 40%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100vh;
+    line-height:1.5;
+  }
+  a{color:var(--amber);}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{padding:28px 0 20px;border-bottom:1px solid var(--line);margin-bottom:32px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--amber);margin:0 0 10px;display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  h1.title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(38px,7vw,64px);
+    letter-spacing:0.01em;
+    margin:0 0 8px;
+    text-transform:uppercase;
+    line-height:0.95;
+  }
+  .title .accent{color:var(--amber);}
+  .subtitle{color:var(--ink-dim);font-size:15px;max-width:520px;margin:0;}
+
+  /* ---------- Panels ---------- */
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 24px;
+    margin-bottom:22px;
+  }
+  .panel-label{
+    font-family:var(--font-mono);
+    font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 4px;
+  }
+  .panel h2{
+    font-family:var(--font-display);
+    font-size:22px;text-transform:uppercase;letter-spacing:0.01em;
+    margin:0 0 18px;font-weight:600;
+  }
+
+  /* ---------- Setup form ---------- */
+  label{
+    display:block;font-family:var(--font-mono);font-size:11px;
+    letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint);
+    margin:0 0 6px;
+  }
+  input[type=text],input[type=password],input[type=number],select{
+    width:100%;background:var(--surface-2);border:1px solid var(--line-strong);
+    color:var(--ink);border-radius:6px;padding:11px 12px;font-family:var(--font-body);
+    font-size:14px;outline:none;transition:border-color .15s;
+  }
+  input:focus,select:focus{border-color:var(--amber);}
+  .field{margin-bottom:16px;}
+  .field-hint{font-size:12px;color:var(--ink-faint);margin-top:6px;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:560px){.row-2{grid-template-columns:1fr;}}
+
+  .key-box{
+    background:var(--surface-2);border:1px dashed var(--line-strong);
+    border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--ink-dim);
+  }
+  .key-box a{text-decoration:underline;}
+
+  #members-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .member-row{display:flex;align-items:center;gap:10px;}
+  .member-swatch{
+    width:30px;height:30px;border-radius:50%;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:12px;font-weight:600;color:#14110e;
+  }
+  .member-row input{flex:1;}
+
+  button{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    cursor:pointer;border-radius:6px;border:1px solid var(--line-strong);
+    background:var(--surface-2);color:var(--ink);padding:11px 18px;transition:all .15s;
+  }
+  button:hover{border-color:var(--amber);color:var(--amber);}
+  button:disabled{opacity:0.4;cursor:not-allowed;}
+  button.primary{
+    background:var(--amber);color:#1a1409;border-color:var(--amber);font-weight:600;
+  }
+  button.primary:hover{background:#ffbf5c;color:#1a1409;}
+  button.ghost{background:transparent;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px;}
+
+  .error-box{
+    background:rgba(232,101,74,0.1);border:1px solid rgba(232,101,74,0.4);
+    color:var(--coral);border-radius:8px;padding:12px 14px;font-size:13px;margin-top:14px;
+  }
+
+  /* ---------- Loading ---------- */
+  #loading{display:none;}
+  .load-log{
+    font-family:var(--font-mono);font-size:13px;color:var(--ink-dim);
+    display:flex;flex-direction:column;gap:6px;min-height:120px;
+  }
+  .load-log .line{display:flex;gap:10px;align-items:baseline;}
+  .load-log .line .dot{color:var(--green);}
+  .reel{
+    width:46px;height:46px;border-radius:50%;
+    border:3px solid var(--line-strong);border-top-color:var(--amber);
+    animation:spin 0.9s linear infinite;margin:0 auto 20px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){.reel{animation:none;}}
+
+  /* ---------- Results ---------- */
+  #results{display:none;}
+
+  .hero-panel{
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  }
+  .avatar-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+  .avatar-chip{
+    display:flex;align-items:center;gap:8px;
+    background:var(--surface-2);border:1px solid var(--line-strong);
+    border-radius:999px;padding:6px 12px 6px 6px;
+  }
+  .avatar-chip .dot{width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:700;color:#14110e;}
+  .avatar-chip span.name{font-size:12.5px;font-family:var(--font-mono);color:var(--ink-dim);}
+
+  .meter-block{margin-bottom:6px;}
+  .meter-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .meter-title .name{font-size:14px;font-weight:600;}
+  .meter-title .pct{font-family:var(--font-mono);font-size:13px;color:var(--ink-dim);}
+  .meter{display:flex;gap:3px;height:16px;}
+  .meter .seg{flex:1;background:var(--surface-2);border-radius:2px;transition:background .25s;}
+  .meter .seg.on-green{background:var(--green);}
+  .meter .seg.on-amber{background:var(--amber);}
+  .meter .seg.on-coral{background:var(--coral);}
+
+  .genre-list{display:flex;flex-direction:column;gap:16px;}
+  .genre-row .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .genre-row .tag-name{font-family:var(--font-display);font-size:16px;text-transform:uppercase;letter-spacing:0.02em;}
+  .genre-row .coverage{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);}
+
+  .depth-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+  .depth-row select{width:auto;}
+
+  table.track-table{width:100%;border-collapse:collapse;}
+  table.track-table th{
+    text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--ink-faint);padding:0 8px 10px;border-bottom:1px solid var(--line);
+  }
+  table.track-table td{padding:11px 8px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  table.track-table tr:last-child td{border-bottom:none;}
+  .track-num{font-family:var(--font-mono);color:var(--ink-faint);width:26px;}
+  .track-name{font-weight:600;}
+  .track-artist{color:var(--ink-dim);font-size:12.5px;}
+  .coverage-pill{
+    font-family:var(--font-mono);font-size:11px;padding:3px 8px;border-radius:999px;
+    background:rgba(127,203,143,0.15);color:var(--green);white-space:nowrap;
+  }
+  .coverage-pill.mid{background:rgba(242,169,59,0.15);color:var(--amber);}
+  .empty-note{color:var(--ink-faint);font-size:13px;font-style:italic;}
+
+  .rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  @media (max-width:600px){.rec-grid{grid-template-columns:1fr;}}
+  .rec-card{
+    background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;
+    padding:14px 16px;position:relative;overflow:hidden;
+  }
+  .rec-card .idx{
+    font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:6px;
+  }
+  .rec-card .rname{font-weight:700;font-size:14.5px;margin-bottom:3px;}
+  .rec-card .rartist{color:var(--ink-dim);font-size:13px;margin-bottom:10px;}
+  .rec-card .rwhy{font-family:var(--font-mono);font-size:11px;color:var(--amber);}
+  .rec-card a.lfm-link{position:absolute;top:12px;right:14px;font-size:11px;color:var(--ink-faint);text-decoration:none;}
+  .rec-card a.lfm-link:hover{color:var(--amber);}
+
+  .footnote{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:16px;margin-top:8px;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible{
+    outline:2px solid var(--amber);outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Last.fm Group Analysis</p>
+    <h1 class="title">Cross<span class="accent">fade</span></h1>
+    <p class="subtitle">Pull everyone's Last.fm history, find the tracks and genres the group already shares, and surface new songs built from the overlap — no one's individual taste dominating.</p>
+  </div>
+
+  <!-- ============ SETUP ============ -->
+  <section id="setup" class="panel">
+    <p class="panel-label">Step 1</p>
+    <h2>Set up the group</h2>
+
+    <div class="key-box">
+      This runs entirely in your browser and calls the Last.fm API directly, so it needs your own free API key.
+      Get one at <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">last.fm/api/account/create</a> — any app name works. The key isn't stored anywhere once you close this page.
+    </div>
+
+    <div class="field">
+      <label for="apiKey">Last.fm API key</label>
+      <input type="password" id="apiKey" placeholder="Paste your API key" autocomplete="off">
+    </div>
+
+    <div class="field" style="max-width:220px;">
+      <label for="groupSize">People in the group</label>
+      <input type="number" id="groupSize" min="2" max="10" value="3">
+      <p class="field-hint">2–10 members</p>
+    </div>
+
+    <div id="members-wrap">
+      <label>Last.fm usernames</label>
+      <div id="members-list"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="primary" id="analyzeBtn">Analyze the group</button>
+    </div>
+    <div id="setupError"></div>
+  </section>
+
+  <!-- ============ LOADING ============ -->
+  <section id="loading" class="panel">
+    <div class="reel"></div>
+    <p class="panel-label" style="text-align:center;">Working</p>
+    <h2 style="text-align:center;">Cueing everything up…</h2>
+    <div class="load-log" id="loadLog"></div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results">
+
+    <div class="panel hero-panel">
+      <p class="panel-label">The group</p>
+      <div class="avatar-row" id="avatarRow"></div>
+      <p class="panel-label">Signal match — top shared genres</p>
+      <div id="heroMeters"></div>
+    </div>
+
+    <div class="panel" id="genresPanel">
+      <p class="panel-label">Common ground</p>
+      <h2>Shared genres</h2>
+      <div class="genre-list" id="genreList"></div>
+    </div>
+
+    <div class="panel" id="tracksPanel">
+      <p class="panel-label">Already on everyone's rotation</p>
+      <div class="depth-row">
+        <h2 style="margin:0;">Tracks the group already shares</h2>
+        <div>
+          <label for="depthSelect" style="display:inline;margin-right:8px;">Look within top</label>
+          <select id="depthSelect">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+      <p style="color:var(--ink-dim);font-size:13px;margin-top:-8px;">Showing tracks that appear in at least 80% of the group's top tracks, at the selected depth.</p>
+      <div id="tracksTableWrap" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel" id="recsPanel">
+      <p class="panel-label">Built from the overlap</p>
+      <h2>New tracks the group might all like</h2>
+      <div class="rec-grid" id="recGrid"></div>
+      <div class="btn-row">
+        <button id="respinBtn">↻ Re-spin the mix</button>
+      </div>
+    </div>
+
+    <div class="footnote">
+      Genres come from Last.fm's community tags on each member's most-played artists. Last.fm doesn't expose tempo or
+      audio-feature data, so matching is based on tag overlap, listening rank, and Last.fm's own "similar artists /
+      similar tracks" signals rather than BPM or key. Recommended tracks are limited to songs that don't already
+      appear in anyone's top 100.
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const PALETTE = ['#f2a93b','#7fcb8f','#e8654a','#6fa8dc','#c58af2','#f2d63b','#4fd1c5','#f28fb1','#a3d977','#ffb4a2'];
+  const API_ROOT = "https://ws.audioscrobbler.com/2.0/";
+
+  let state = {
+    apiKey:"",
+    members:[], // {username, color}
+    data:{},    // username -> {topTracks:[], topArtists:[], tagWeights:Map, topTags:[{tag,weight}]}
+    commonGenres:[], // {tag, coverage, members:Set, weight}
+    commonTracksAllDepth:[], // computed per depth on demand from cached topTracks
+    knownTrackKeys:new Set(),
+    recPool:[], // sorted candidate list {key,artist,name,score,why,listeners}
+    recPointer:0
+  };
+
+  // ---------- DOM helpers ----------
+  const $ = (id)=>document.getElementById(id);
+  function el(tag, cls, html){
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(html!==undefined) e.innerHTML = html;
+    return e;
+  }
+
+  // ---------- Member rows ----------
+  function renderMemberRows(){
+    const n = Math.max(2, Math.min(10, parseInt($('groupSize').value)||2));
+    $('groupSize').value = n;
+    const list = $('members-list');
+    const existing = Array.from(list.querySelectorAll('input')).map(i=>i.value);
+    list.innerHTML = "";
+    for(let i=0;i<n;i++){
+      const row = el('div','member-row');
+      const swatch = el('div','member-swatch', String(i+1));
+      swatch.style.background = PALETTE[i % PALETTE.length];
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Last.fm username';
+      input.value = existing[i] || "";
+      input.dataset.idx = i;
+      row.appendChild(swatch);
+      row.appendChild(input);
+      list.appendChild(row);
+    }
+  }
+  $('groupSize').addEventListener('input', renderMemberRows);
+  renderMemberRows();
+
+  // ---------- Last.fm fetch ----------
+  const tagCache = new Map(); // artist lowercase -> [{tag,count}]
+
+  async function lfmCall(method, params, retry){
+    const url = new URL(API_ROOT);
+    url.searchParams.set('method', method);
+    url.searchParams.set('api_key', state.apiKey);
+    url.searchParams.set('format', 'json');
+    for(const k in params) url.searchParams.set(k, params[k]);
+    let res;
+    try{
+      res = await fetch(url.toString());
+    }catch(err){
+      throw new Error('Network request failed — check your connection or that the API key is valid.');
+    }
+    let data;
+    try{ data = await res.json(); }
+    catch(err){ throw new Error('Last.fm returned an unreadable response for '+method+'.'); }
+    if(data.error){
+      if(data.error === 29 && !retry){ // rate limit
+        await sleep(600);
+        return lfmCall(method, params, true);
+      }
+      throw new Error((data.message||'Last.fm API error') + ' ('+method+')');
+    }
+    return data;
+  }
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  async function runPool(items, worker, concurrency){
+    const results = new Array(items.length);
+    let idx = 0;
+    async function next(){
+      while(idx < items.length){
+        const my = idx++;
+        try{ results[my] = await worker(items[my], my); }
+        catch(e){ results[my] = null; }
+      }
+    }
+    const workers = [];
+    for(let i=0;i<concurrency;i++) workers.push(next());
+    await Promise.all(workers);
+    return results;
+  }
+
+  function trackKey(artist, name){
+    return (artist||"").trim().toLowerCase() + "|||" + (name||"").trim().toLowerCase();
+  }
+
+  function log(msg){
+    const line = el('div','line', '<span class="dot">●</span><span>'+msg+'</span>');
+    $('loadLog').appendChild(line);
+    $('loadLog').scrollTop = $('loadLog').scrollHeight;
+  }
+
+  // ---------- Fetch per-member data ----------
+  async function fetchMember(username, color){
+    const info = await lfmCall('user.getInfo', {user:username});
+    if(!info.user) throw new Error('Could not find Last.fm user "'+username+'".');
+
+    const tt = await lfmCall('user.getTopTracks', {user:username, period:'overall', limit:100});
+    const rawTracks = (tt.toptracks && tt.toptracks.track) || [];
+    const topTracks = rawTracks.map((t,i)=>({
+      artist: t.artist ? t.artist.name : '',
+      name: t.name,
+      playcount: parseInt(t.playcount)||0,
+      rank: i+1
+    }));
+
+    const ta = await lfmCall('user.getTopArtists', {user:username, period:'overall', limit:50});
+    const rawArtists = (ta.topartists && ta.topartists.artist) || [];
+    const topArtists = rawArtists.map((a,i)=>({
+      name:a.name, playcount: parseInt(a.playcount)||0, rank:i+1
+    }));
+
+    return {username, color, topTracks, topArtists, tagWeights:new Map(), topTags:[]};
+  }
+
+  async function fetchTagsForArtist(name){
+    const key = name.toLowerCase();
+    if(tagCache.has(key)) return tagCache.get(key);
+    try{
+      const res = await lfmCall('artist.getTopTags', {artist:name, autocorrect:1});
+      const tags = (res.toptags && res.toptags.tag) || [];
+      const parsed = tags.slice(0,6).map(t=>({tag:(t.name||'').toLowerCase(), count:parseInt(t.count)||0}));
+      tagCache.set(key, parsed);
+      return parsed;
+    }catch(e){
+      tagCache.set(key, []);
+      return [];
+    }
+  }
+
+  function isJunkTag(tag){
+    if(!tag) return true;
+    const junk = ['seen live','favorite','favorites','favourite','favourites','albums i own','under 2000 listeners'];
+    return junk.includes(tag) || /^\d{4}$/.test(tag);
+  }
+
+  async function buildTagProfile(member){
+    const topN = member.topArtists.slice(0,12);
+    await runPool(topN, async (artist)=>{
+      const tags = await fetchTagsForArtist(artist.name);
+      const baseWeight = Math.max(0, 13 - artist.rank);
+      tags.forEach(t=>{
+        if(isJunkTag(t.tag)) return;
+        const add = baseWeight * (Math.max(t.count,5)/100);
+        member.tagWeights.set(t.tag, (member.tagWeights.get(t.tag)||0) + add);
+      });
+    }, 4);
+    member.topTags = Array.from(member.tagWeights.entries())
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,15)
+      .map(([tag,weight])=>({tag,weight}));
+  }
+
+  // ---------- Analysis ----------
+  function computeCommonGenres(){
+    const tagCoverage = new Map(); // tag -> {members:Set, weight}
+    state.members.forEach(m=>{
+      const data = state.data[m.username];
+      data.topTags.forEach(({tag,weight})=>{
+        if(!tagCoverage.has(tag)) tagCoverage.set(tag, {members:new Set(), weight:0});
+        const entry = tagCoverage.get(tag);
+        entry.members.add(m.username);
+        entry.weight += weight;
+      });
+    });
+    const arr = Array.from(tagCoverage.entries())
+      .map(([tag, v])=>({tag, coverage:v.members.size, weight:v.weight}))
+      .filter(x=>x.coverage >= 2 || state.members.length === 1);
+    arr.sort((a,b)=> b.coverage - a.coverage || b.weight - a.weight);
+    state.commonGenres = arr.slice(0,8);
+  }
+
+  function computeCommonTracks(depth){
+    const groupSize = state.members.length;
+    const threshold = Math.ceil(groupSize * 0.8);
+    const trackMap = new Map(); // key -> {artist,name,members:Set, totalPlays, bestRank}
+    state.members.forEach(m=>{
+      const data = state.data[m.username];
+      data.topTracks.slice(0, depth).forEach(t=>{
+        const key = trackKey(t.artist, t.name);
+        if(!trackMap.has(key)) trackMap.set(key, {artist:t.artist, name:t.name, members:new Set(), totalPlays:0, bestRank:9999});
+        const entry = trackMap.get(key);
+        entry.members.add(m.username);
+        entry.totalPlays += t.playcount;
+        entry.bestRank = Math.min(entry.bestRank, t.rank);
+      });
+    });
+    const arr = Array.from(trackMap.values())
+      .filter(t=>t.members.size >= threshold)
+      .sort((a,b)=> b.members.size - a.members.size || b.totalPlays - a.totalPlays);
+    return arr;
+  }
+
+  function buildKnownTrackKeys(){
+    const set = new Set();
+    state.members.forEach(m=>{
+      state.data[m.username].topTracks.forEach(t=> set.add(trackKey(t.artist, t.name)));
+    });
+    state.knownTrackKeys = set;
+  }
+
+  // ---------- Recommendations ----------
+  async function buildRecommendationPool(){
+    const candidateMap = new Map(); // key -> {artist,name,score,why,listeners}
+
+    // Seed tracks: best common tracks at depth 50 (fallback to top personal tracks if none)
+    let seedTracks = computeCommonTracks(50).slice(0,6);
+    if(seedTracks.length === 0){
+      // fallback: everyone's #1 track
+      seedTracks = state.members.map(m=>{
+        const t = state.data[m.username].topTracks[0];
+        return t ? {artist:t.artist, name:t.name, members:new Set([m.username])} : null;
+      }).filter(Boolean);
+    }
+
+    // Seed artists: aggregate artist weight across members
+    const artistAgg = new Map();
+    state.members.forEach(m=>{
+      state.data[m.username].topArtists.slice(0,15).forEach(a=>{
+        const w = Math.max(0, 16 - a.rank);
+        artistAgg.set(a.name, (artistAgg.get(a.name)||0) + w);
+      });
+    });
+    const seedArtists = Array.from(artistAgg.entries())
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,8)
+      .map(([name,weight])=>({name,weight}));
+
+    // similar tracks per seed track
+    await runPool(seedTracks, async (seed)=>{
+      try{
+        const res = await lfmCall('track.getSimilar', {artist:seed.artist, track:seed.name, limit:12, autocorrect:1});
+        const sims = (res.similartracks && res.similartracks.track) || [];
+        const seedWeight = 1 + (seed.members ? seed.members.size : 1);
+        sims.forEach(s=>{
+          const key = trackKey(s.artist.name, s.name);
+          if(state.knownTrackKeys.has(key)) return;
+          const match = parseFloat(s.match)||0.3;
+          const score = match * seedWeight * 2;
+          upsertCandidate(candidateMap, key, s.artist.name, s.name, s.listeners, score, 'Similar to "'+seed.name+'"');
+        });
+      }catch(e){}
+    }, 3);
+
+    // similar artists per seed artist -> pull their top tracks isn't available cheaply,
+    // so use artist.getSimilar and treat matched artists' presence as a mild boost via getTopTracks of the artist (limited)
+    await runPool(seedArtists, async (seed)=>{
+      try{
+        const res = await lfmCall('artist.getSimilar', {artist:seed.name, limit:6, autocorrect:1});
+        const sims = (res.similarartists && res.similarartists.artist) || [];
+        for(const s of sims){
+          try{
+            const tt = await lfmCall('artist.getTopTracks', {artist:s.name, limit:3, autocorrect:1});
+            const tracks = (tt.toptracks && tt.toptracks.track) || [];
+            tracks.forEach(t=>{
+              const key = trackKey(s.name, t.name);
+              if(state.knownTrackKeys.has(key)) return;
+              const match = parseFloat(s.match)||0.3;
+              const score = match * (seed.weight/8) * 1.5;
+              upsertCandidate(candidateMap, key, s.name, t.name, t.listeners, score, 'Fans of '+seed.name+' also like this');
+            });
+          }catch(e){}
+        }
+      }catch(e){}
+    }, 3);
+
+    // rank
+    let pool = Array.from(candidateMap.values());
+    // cap 2 tracks per artist for diversity
+    const perArtistCount = new Map();
+    pool = pool.filter(c=>{
+      const n = perArtistCount.get(c.artist.toLowerCase())||0;
+      if(n>=2) return false;
+      perArtistCount.set(c.artist.toLowerCase(), n+1);
+      return true;
+    });
+    pool.sort((a,b)=> b.score - a.score);
+    state.recPool = pool;
+    state.recPointer = 0;
+  }
+
+  function upsertCandidate(map, key, artist, name, listeners, score, why){
+    const existing = map.get(key);
+    const listenerBoost = Math.min(1, (parseInt(listeners)||0)/200000);
+    const total = score + listenerBoost*0.4;
+    if(!existing || total > existing.score){
+      map.set(key, {artist, name, score: existing? Math.max(existing.score, total): total, why, listeners});
+    } else {
+      existing.score += 0.15; // slight boost for being suggested from multiple seeds
+    }
+  }
+
+  // ---------- Render ----------
+  function renderAvatars(){
+    const row = $('avatarRow');
+    row.innerHTML = "";
+    state.members.forEach(m=>{
+      const chip = el('div','avatar-chip');
+      const dot = el('div','dot', m.username[0].toUpperCase());
+      dot.style.background = m.color;
+      chip.appendChild(dot);
+      chip.appendChild(el('span','name', '@'+m.username));
+      row.appendChild(chip);
+    });
+  }
+
+  function renderHeroMeters(){
+    const wrap = $('heroMeters');
+    wrap.innerHTML = "";
+    const top = state.commonGenres.slice(0,4);
+    if(top.length === 0){
+      wrap.appendChild(el('p','empty-note', 'No strongly shared genres surfaced — this group’s tastes are fairly spread out.'));
+      return;
+    }
+    const groupSize = state.members.length;
+    top.forEach(g=>{
+      const pct = Math.round((g.coverage/groupSize)*100);
+      const block = el('div','meter-block');
+      const title = el('div','meter-title',
+        '<span class="name">'+capitalize(g.tag)+'</span><span class="pct">'+pct+'% of group</span>');
+      const meter = el('div','meter');
+      const segCount = 20;
+      const onSegs = Math.round((pct/100)*segCount);
+      for(let i=0;i<segCount;i++){
+        const cls = i<onSegs ? (pct>=80?'seg on-green': pct>=50?'seg on-amber':'seg on-coral') : 'seg';
+        meter.appendChild(el('div', cls));
+      }
+      block.appendChild(title);
+      block.appendChild(meter);
+      wrap.appendChild(block);
+    });
+  }
+
+  function capitalize(s){ return s.replace(/\b\w/g, c=>c.toUpperCase()); }
+
+  function renderGenreList(){
+    const list = $('genreList');
+    list.innerHTML = "";
+    if(state.commonGenres.length===0){
+      list.appendChild(el('p','empty-note','No shared genres found across at least two members.'));
+      return;
+    }
+    state.commonGenres.forEach(g=>{
+      const row = el('div','genre-row');
+      const top = el('div','top',
+        '<span class="tag-name">'+capitalize(g.tag)+'</span><span class="coverage">'+g.coverage+' / '+state.members.length+' members</span>');
+      row.appendChild(top);
+      list.appendChild(row);
+    });
+  }
+
+  function renderTracksTable(){
+    const depth = parseInt($('depthSelect').value);
+    const tracks = computeCommonTracks(depth);
+    const wrap = $('tracksTableWrap');
+    wrap.innerHTML = "";
+    if(tracks.length===0){
+      wrap.appendChild(el('p','empty-note','Nobody’s top '+depth+' overlaps at the 80% threshold yet — try a larger "top" range above.'));
+      return;
+    }
+    const table = el('table','track-table');
+    const thead = el('thead','', '<tr><th>#</th><th>Track</th><th>Group match</th></tr>');
+    const tbody = document.createElement('tbody');
+    tracks.forEach((t,i)=>{
+      const pct = Math.round((t.members.size/state.members.length)*100);
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="track-num">'+(i+1)+'</td>'+
+        '<td><div class="track-name">'+escapeHtml(t.name)+'</div><div class="track-artist">'+escapeHtml(t.artist)+'</div></td>'+
+        '<td><span class="coverage-pill'+(pct<100?' mid':'')+'">'+t.members.size+'/'+state.members.length+' · '+pct+'%</span></td>';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+  }
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s||"";
+    return d.innerHTML;
+  }
+
+  function renderRecs(){
+    const grid = $('recGrid');
+    grid.innerHTML = "";
+    const slice = state.recPool.slice(state.recPointer, state.recPointer+10);
+    if(slice.length===0){
+      grid.appendChild(el('p','empty-note','Couldn’t find enough fresh recommendations — try re-spinning or check back with a larger group.'));
+      return;
+    }
+    slice.forEach((c,i)=>{
+      const card = el('div','rec-card');
+      const url = 'https://www.last.fm/music/'+encodeURIComponent(c.artist)+'/_/'+encodeURIComponent(c.name);
+      card.innerHTML =
+        '<a class="lfm-link" href="'+url+'" target="_blank" rel="noopener">↗</a>'+
+        '<div class="idx">TRACK '+(state.recPointer+i+1)+'</div>'+
+        '<div class="rname">'+escapeHtml(c.name)+'</div>'+
+        '<div class="rartist">'+escapeHtml(c.artist)+'</div>'+
+        '<div class="rwhy">'+escapeHtml(c.why)+'</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  $('respinBtn').addEventListener('click', ()=>{
+    state.recPointer += 10;
+    if(state.recPointer >= state.recPool.length) state.recPointer = 0;
+    renderRecs();
+  });
+
+  $('depthSelect').addEventListener('change', renderTracksTable);
+
+  // ---------- Main flow ----------
+  $('analyzeBtn').addEventListener('click', async ()=>{
+    $('setupError').innerHTML = "";
+    const apiKey = $('apiKey').value.trim();
+    const usernameInputs = Array.from(document.querySelectorAll('#members-list input'));
+    const usernames = usernameInputs.map(i=>i.value.trim()).filter(Boolean);
+
+    if(!apiKey){ showSetupError('Add your Last.fm API key first.'); return; }
+    if(usernames.length < 2){ showSetupError('Enter at least two Last.fm usernames.'); return; }
+    const dupes = usernames.filter((u,i)=>usernames.indexOf(u.toLowerCase().trim())!==i);
+
+    state.apiKey = apiKey;
+    state.members = usernames.map((u,i)=>({username:u, color:PALETTE[i%PALETTE.length]}));
+    state.data = {};
+
+    $('setup').style.display = 'none';
+    $('loading').style.display = 'block';
+    $('loadLog').innerHTML = "";
+
+    try{
+      log('Connecting to Last.fm…');
+      for(const m of state.members){
+        log('Cueing up @'+m.username+'’s scrobbles…');
+        const memberData = await fetchMember(m.username);
+        state.data[m.username] = memberData;
+      }
+      log('Reading genre tags off everyone’s top artists…');
+      for(const m of state.members){
+        await buildTagProfile(state.data[m.username]);
+      }
+      log('Finding where the signals overlap…');
+      computeCommonGenres();
+      buildKnownTrackKeys();
+      log('Digging up new tracks the group hasn’t heard yet…');
+      await buildRecommendationPool();
+      log('Done.');
+
+      renderAvatars();
+      renderHeroMeters();
+      renderGenreList();
+      renderTracksTable();
+      renderRecs();
+
+      $('loading').style.display = 'none';
+      $('results').style.display = 'block';
+    }catch(err){
+      $('loading').style.display = 'none';
+      $('setup').style.display = 'block';
+      showSetupError(err.message || 'Something went wrong talking to Last.fm.');
+    }
+  });
+
+  function showSetupError(msg){
+    $('setupError').innerHTML = '<div class="error-box">'+escapeHtml(msg)+'</div>';
+  }
+
+})();
+</script>
+</body>
+</html>
