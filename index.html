@@ -235,13 +235,7 @@
     <h2>Set up the group</h2>
 
     <div class="key-box">
-      This runs entirely in your browser and calls the Last.fm API directly, so it needs your own free API key.
-      Get one at <a href="https://www.last.fm/api/account/create" target="_blank" rel="noopener">last.fm/api/account/create</a> — any app name works. The key isn't stored anywhere once you close this page.
-    </div>
-
-    <div class="field">
-      <label for="apiKey">Last.fm API key</label>
-      <input type="password" id="apiKey" placeholder="Paste your API key" autocomplete="off">
+      This runs entirely in your browser and calls the Last.fm API directly. No account or sign-in needed — just add your Last.fm usernames below.
     </div>
 
     <div class="field" style="max-width:220px;">
@@ -328,9 +322,11 @@
 
   const PALETTE = ['#f2a93b','#7fcb8f','#e8654a','#6fa8dc','#c58af2','#f2d63b','#4fd1c5','#f28fb1','#a3d977','#ffb4a2'];
   const API_ROOT = "https://ws.audioscrobbler.com/2.0/";
+  // Shared read-only Last.fm API key so visitors don't need to create their own.
+  const LASTFM_API_KEY = "291c3a31720eaa57b5aa6373f23d8cb5";
 
   let state = {
-    apiKey:"",
+    apiKey:LASTFM_API_KEY,
     members:[], // {username, color}
     data:{},    // username -> {topTracks:[], topArtists:[], tagWeights:Map, topTags:[{tag,weight}]}
     commonGenres:[], // {tag, coverage, members:Set, weight}
@@ -752,15 +748,13 @@
   // ---------- Main flow ----------
   $('analyzeBtn').addEventListener('click', async ()=>{
     $('setupError').innerHTML = "";
-    const apiKey = $('apiKey').value.trim();
     const usernameInputs = Array.from(document.querySelectorAll('#members-list input'));
     const usernames = usernameInputs.map(i=>i.value.trim()).filter(Boolean);
 
-    if(!apiKey){ showSetupError('Add your Last.fm API key first.'); return; }
     if(usernames.length < 2){ showSetupError('Enter at least two Last.fm usernames.'); return; }
     const dupes = usernames.filter((u,i)=>usernames.indexOf(u.toLowerCase().trim())!==i);
 
-    state.apiKey = apiKey;
+    state.apiKey = LASTFM_API_KEY;
     state.members = usernames.map((u,i)=>({username:u, color:PALETTE[i%PALETTE.length]}));
     state.data = {};
 
