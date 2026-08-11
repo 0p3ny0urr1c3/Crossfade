@@ -14,13 +14,24 @@ Give it a Last.fm username for each person in a group, and it will show:
 
 ## Getting started
 
-1. Get a free Last.fm API key at [last.fm/api/account/create](https://www.last.fm/api/account/create) (any app name works).
-2. Open `crossfade.html` in a browser.
-3. Paste in your API key.
-4. Set the group size (2–10 people) and enter each person's Last.fm username.
-5. Click **Analyze the group**.
+1. Open `crossfade.html` in a browser (or visit the hosted site).
+2. Set the group size (2–10 people) and enter each person's Last.fm username.
+3. Click **Analyze the group**.
 
-That's it — no installation, no accounts, no data leaves your browser except the requests to Last.fm's API.
+That's it — no installation, no accounts, no sign-in. The site ships with a shared Last.fm API key baked in, so nobody needs to create their own.
+
+### Running it with your own API key instead
+
+The app calls the Last.fm API with a key hardcoded near the top of the `<script>` block:
+
+```js
+const LASTFM_API_KEY = "...";
+```
+
+If you fork this project, swap in your own free key from [last.fm/api/account/create](https://www.last.fm/api/account/create). A couple of things worth knowing before you deploy:
+
+- This is a static, client-side-only site (e.g. GitHub Pages), so **anything in the HTML/JS is publicly visible** — including the API key. Last.fm keys are read-only by default (no write/scrobble access without a session + shared secret, which this app never uses), so exposing one is low-risk, but all traffic through it shares one rate limit.
+- If the key ever gets rate-limited or you want to rotate it, generate a new one from your Last.fm API account page and swap it into `LASTFM_API_KEY` — no other code changes needed.
 
 ## How the analysis works
 
