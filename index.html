@@ -345,6 +345,8 @@
             <option value="20">20</option>
             <option value="50" selected>50</option>
             <option value="100">100</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
           </select>
         </div>
       </div>
@@ -365,7 +367,7 @@
       Genres come from Last.fm's community tags on each member's most-played artists. Last.fm doesn't expose tempo or
       audio-feature data, so matching is based on tag overlap, listening rank, and Last.fm's own "similar artists /
       similar tracks" signals rather than BPM or key. Recommended tracks are limited to songs that don't already
-      appear in anyone's top 100.
+      appear in anyone's top 1000.
     </div>
   </section>
 
@@ -498,7 +500,7 @@
     const info = await lfmCall('user.getInfo', {user:username});
     if(!info.user) throw new Error('Could not find Last.fm user "'+username+'".');
 
-    const tt = await lfmCall('user.getTopTracks', {user:username, period:'overall', limit:100});
+    const tt = await lfmCall('user.getTopTracks', {user:username, period:'overall', limit:1000});
     const rawTracks = (tt.toptracks && tt.toptracks.track) || [];
     const topTracks = rawTracks.map((t,i)=>({
       artist: t.artist ? t.artist.name : '',
